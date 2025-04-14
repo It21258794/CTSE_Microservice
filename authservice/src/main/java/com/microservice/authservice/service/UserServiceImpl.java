@@ -8,7 +8,9 @@ import com.microservice.authservice.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -18,6 +20,7 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder passwordEncoder;
+    private final S3Service s3Service;
 
     @Override
     public List<UserResponseDTO> getAllUsers() {
@@ -94,5 +97,16 @@ public class UserServiceImpl implements UserService {
         return userRepository.findByIsActive(false).stream()  // Changed to findByIsActive
                 .map(this::mapToUserResponseDTO)
                 .collect(Collectors.toList());
+    }
+    @Override
+    public String uploadProfilePicture(String userId, MultipartFile file) throws IOException {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        String imageUrl = s3Service.uploadFile(file);
+        user.setProfilePictureUrl(imageUrl);
+        userRepository.save(user);
+
+        return imageUrl;
     }
 }

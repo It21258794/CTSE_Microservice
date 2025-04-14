@@ -7,7 +7,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -54,4 +56,13 @@ public class UserController {
     public ResponseEntity<List<UserResponseDTO>> getInactiveUsers() {
         return ResponseEntity.ok(userService.getInactiveUsers());
     }
+
+    @PostMapping("/{id}/profile-picture")
+    public ResponseEntity<String> uploadProfilePicture(
+            @PathVariable String id,
+            @RequestParam("file") MultipartFile file) throws IOException {
+        String imageUrl = userService.uploadProfilePicture(id, file);
+        return ResponseEntity.ok(imageUrl);
+    }
+
 }
