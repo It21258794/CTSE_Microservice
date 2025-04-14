@@ -16,5 +16,7 @@ public interface UserService {
     List<UserResponseDTO> getActiveUsers();
     List<UserResponseDTO> getInactiveUsers();
     String uploadProfilePicture(String userId, MultipartFile file) throws IOException;
-
+    String getProfilePicture(String userId);
+    String updateProfilePicture(String userId, MultipartFile file) throws IOException;
+    void deleteProfilePicture(String userId);
 }

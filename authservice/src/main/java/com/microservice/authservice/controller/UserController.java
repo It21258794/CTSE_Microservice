@@ -65,4 +65,22 @@ public class UserController {
         return ResponseEntity.ok(imageUrl);
     }
 
+    @GetMapping("/{id}/profile-picture")
+    public ResponseEntity<String> getProfilePicture(@PathVariable String id) {
+        return ResponseEntity.ok(userService.getProfilePicture(id));
+    }
+
+    @PutMapping("/{id}/profile-picture")
+    public ResponseEntity<String> updateProfilePicture(
+            @PathVariable String id,
+            @RequestParam("file") MultipartFile file) throws IOException {
+        return ResponseEntity.ok(userService.updateProfilePicture(id, file));
+    }
+
+    @DeleteMapping("/{id}/profile-picture")
+    public ResponseEntity<Void> deleteProfilePicture(@PathVariable String id) {
+        userService.deleteProfilePicture(id);
+        return ResponseEntity.noContent().build();
+    }
+
 }

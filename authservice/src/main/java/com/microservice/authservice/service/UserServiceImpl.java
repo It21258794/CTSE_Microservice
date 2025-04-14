@@ -71,6 +71,7 @@ public class UserServiceImpl implements UserService {
                 .email(user.getEmail())
                 .role(user.getRole())
                 .isActive(user.isActive())
+                .profilePictureUrl(user.getProfilePictureUrl())  // Add this line
                 .build();
     }
 
@@ -108,5 +109,53 @@ public class UserServiceImpl implements UserService {
         userRepository.save(user);
 
         return imageUrl;
+    }
+
+    @Override
+    public String getProfilePicture(String userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        if (user.getProfilePictureUrl() == null || user.getProfilePictureUrl().isEmpty()) {
+            throw new RuntimeException("Profile picture not found for user");
+        }
+        return user.getProfilePictureUrl();
+    }
+
+    @Override
+    public String updateProfilePicture(String userId, MultipartFile file) throws IOException {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        // Delete old picture if exists
+        if (user.getProfilePictureUrl() != null && !user.getProfilePictureUrl().isEmpty()) {
+            deleteProfilePictureFromS3(user.getProfilePictureUrl());
+        }
+
+        // Upload new picture
+        String imageUrl = s3Service.uploadFile(file);
+        user.setProfilePictureUrl(imageUrl);
+        userRepository.save(user);
+
+        return imageUrl;
+    }
+
+    @Override
+    public void deleteProfilePicture(String userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        if (user.getProfilePictureUrl() != null && !user.getProfilePictureUrl().isEmpty()) {
+            deleteProfilePictureFromS3(user.getProfilePictureUrl());
+            user.setProfilePictureUrl(null);
+            userRepository.save(user);
+        }
+    }
+
+    private void deleteProfilePictureFromS3(String imageUrl) {
+        try {
+            s3Service.deleteFile(imageUrl);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to delete profile picture from S3", e);
+        }
     }
 }
