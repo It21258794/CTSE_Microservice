@@ -50,8 +50,8 @@ public class UserController {
         return ResponseEntity.ok(userService.getActiveUsers());
     }
 
-    @GetMapping("/deactive")
-    public ResponseEntity<List<UserResponseDTO>> getDeactiveUsers() {
-        return ResponseEntity.ok(userService.getDeactiveUsers());
+    @GetMapping("/inactive")
+    public ResponseEntity<List<UserResponseDTO>> getInactiveUsers() {
+        return ResponseEntity.ok(userService.getInactiveUsers());
     }
 }

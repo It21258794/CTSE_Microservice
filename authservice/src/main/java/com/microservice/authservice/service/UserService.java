@@ -11,5 +11,5 @@ public interface UserService {
     void deleteUser(String id);
     UserResponseDTO toggleUserStatus(String id);
     List<UserResponseDTO> getActiveUsers();
-    List<UserResponseDTO> getDeactiveUsers();
+    List<UserResponseDTO> getInactiveUsers();
 }

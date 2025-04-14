@@ -42,9 +42,8 @@ public class UserServiceImpl implements UserService {
         existingUser.setLastName(userDTO.getLastName());
         existingUser.setEmail(userDTO.getEmail());
         existingUser.setRole(userDTO.getRole());
-        existingUser.setStatus(userDTO.getStatus());
+        existingUser.setActive(userDTO.isActive());  // Changed from setIsActive to setActive
 
-        // Only update password if it's provided in the DTO
         if (userDTO.getPassword() != null && !userDTO.getPassword().isEmpty()) {
             existingUser.setPassword(passwordEncoder.encode(userDTO.getPassword()));
         }
@@ -68,7 +67,7 @@ public class UserServiceImpl implements UserService {
                 .lastName(user.getLastName())
                 .email(user.getEmail())
                 .role(user.getRole())
-                .status(user.getStatus())
+                .isActive(user.isActive())
                 .build();
     }
 
@@ -77,12 +76,7 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("User not found with id: " + id));
 
-        // Toggle between Active/Deactive
-        String newStatus = user.getStatus().equalsIgnoreCase("Active")
-                ? "Deactive"
-                : "Active";
-
-        user.setStatus(newStatus);
+        user.setActive(!user.isActive());
         User updatedUser = userRepository.save(user);
 
         return mapToUserResponseDTO(updatedUser);
@@ -90,14 +84,14 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<UserResponseDTO> getActiveUsers() {
-        return userRepository.findByStatus("Active").stream()
+        return userRepository.findByIsActive(true).stream()  // Changed to findByIsActive
                 .map(this::mapToUserResponseDTO)
                 .collect(Collectors.toList());
     }
 
     @Override
-    public List<UserResponseDTO> getDeactiveUsers() {
-        return userRepository.findByStatus("Deactive").stream()
+    public List<UserResponseDTO> getInactiveUsers() {
+        return userRepository.findByIsActive(false).stream()  // Changed to findByIsActive
                 .map(this::mapToUserResponseDTO)
                 .collect(Collectors.toList());
     }
