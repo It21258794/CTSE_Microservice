@@ -2,69 +2,103 @@ package com.microservice.authservice.Services;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.mail.SimpleMailMessage;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.test.util.ReflectionTestUtils;
+import org.mockito.MockitoAnnotations;
+import software.amazon.awssdk.services.ses.SesClient;
+import software.amazon.awssdk.services.ses.model.SendEmailRequest;
+import software.amazon.awssdk.services.ses.model.SendEmailResponse;
+import software.amazon.awssdk.services.ses.model.SesException;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-@ExtendWith(MockitoExtension.class)
 class EmailServiceTest {
 
     @Mock
-    private JavaMailSender mailSender;
+    private SesClient sesClient;
 
     @InjectMocks
     private EmailService emailService;
 
     @BeforeEach
     void setUp() {
-        ReflectionTestUtils.setField(emailService, "fromEmail", "test@example.com");
+        MockitoAnnotations.openMocks(this);
     }
 
     @Test
-    void sendEmail_ShouldSendEmailSuccessfully() {
+    void sendEmail_Success() {
+        // Arrange
+        String toEmail = "test@example.com";
+        String subject = "Test Subject";
+        String body = "Test Body";
+        SendEmailResponse mockResponse = SendEmailResponse.builder()
+                .messageId("test-message-id")
+                .build();
+
+        when(sesClient.sendEmail(any(SendEmailRequest.class))).thenReturn(mockResponse);
+
         // Act
-        emailService.sendEmail("recipient@example.com", "Test Subject", "Test Body");
+        emailService.sendEmail(toEmail, subject, body);
 
         // Assert
-        verify(mailSender, times(1)).send(any(SimpleMailMessage.class));
+        verify(sesClient, times(1)).sendEmail(any(SendEmailRequest.class));
     }
 
     @Test
-    void sendEmail_ShouldThrowException_WhenEmailSendingFails() {
+    void sendEmail_Failure() {
         // Arrange
-        doThrow(new RuntimeException("Failed to send email")).when(mailSender).send(any(SimpleMailMessage.class));
+        String toEmail = "test@example.com";
+        String subject = "Test Subject";
+        String body = "Test Body";
+
+        when(sesClient.sendEmail(any(SendEmailRequest.class)))
+                .thenThrow(SesException.builder().message("Failed to send email").build());
 
         // Act & Assert
-        assertThrows(RuntimeException.class, () -> 
-            emailService.sendEmail("recipient@example.com", "Test Subject", "Test Body")
-        );
+        try {
+            emailService.sendEmail(toEmail, subject, body);
+        } catch (RuntimeException e) {
+            // Expected exception
+        }
+
+        verify(sesClient, times(1)).sendEmail(any(SendEmailRequest.class));
     }
 
     @Test
-    void sendOtpEmail_ShouldSendEmailSuccessfully() {
+    void sendOtpEmail_Success() {
+        // Arrange
+        String toEmail = "test@example.com";
+        String otp = "123456";
+        SendEmailResponse mockResponse = SendEmailResponse.builder()
+                .messageId("test-message-id")
+                .build();
+
+        when(sesClient.sendEmail(any(SendEmailRequest.class))).thenReturn(mockResponse);
+
         // Act
-        emailService.sendOtpEmail("recipient@example.com", "123456");
+        emailService.sendOtpEmail(toEmail, otp);
 
         // Assert
-        verify(mailSender, times(1)).send(any(SimpleMailMessage.class));
+        verify(sesClient, times(1)).sendEmail(any(SendEmailRequest.class));
     }
 
     @Test
-    void sendOtpEmail_ShouldThrowException_WhenEmailSendingFails() {
+    void sendOtpEmail_Failure() {
         // Arrange
-        doThrow(new RuntimeException("Failed to send email")).when(mailSender).send(any(SimpleMailMessage.class));
+        String toEmail = "test@example.com";
+        String otp = "123456";
+
+        when(sesClient.sendEmail(any(SendEmailRequest.class)))
+                .thenThrow(SesException.builder().message("Failed to send email").build());
 
         // Act & Assert
-        assertThrows(RuntimeException.class, () -> 
-            emailService.sendOtpEmail("recipient@example.com", "123456")
-        );
+        try {
+            emailService.sendOtpEmail(toEmail, otp);
+        } catch (RuntimeException e) {
+            // Expected exception
+        }
+
+        verify(sesClient, times(1)).sendEmail(any(SendEmailRequest.class));
     }
 } 
