@@ -19,40 +19,50 @@ public class AuthenticationController {
     private final AuthenticationService authenticationService;
 
     @PostMapping("/register")
-    public ResponseEntity<AuthenticationResponse> register(
-            @RequestBody RegisterRequest request
-    ) {
-        return ResponseEntity.ok(authenticationService.register(request));
+    public ResponseEntity<?> register(@RequestBody RegisterRequest request) {
+        try {
+            return ResponseEntity.ok(authenticationService.register(request));
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 
     @PostMapping("/login")
-    public ResponseEntity<AuthenticationResponse> authenticate(
-            @RequestBody AuthenticationRequest request
-    ) {
-        return ResponseEntity.ok(authenticationService.authenticate(request));
+    public ResponseEntity<?> authenticate(@RequestBody AuthenticationRequest request) {
+        try {
+            return ResponseEntity.ok(authenticationService.authenticate(request));
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 
     @PostMapping("/update-password")
-    public ResponseEntity<Void> updatePassword(
-            @RequestBody UpdatePasswordRequest request
-    ) {
-        authenticationService.updatePassword(request);
-        return ResponseEntity.ok().build();
+    public ResponseEntity<?> updatePassword(@RequestBody UpdatePasswordRequest request) {
+        try {
+            authenticationService.updatePassword(request);
+            return ResponseEntity.ok().build();
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 
     @PostMapping("/reset-password-request")
-    public ResponseEntity<Void> resetPasswordRequest(
-            @RequestBody PasswordResetRequestDto request
-    ) {
-        authenticationService.initiatePasswordReset(request);
-        return ResponseEntity.ok().build();
+    public ResponseEntity<?> resetPasswordRequest(@RequestBody PasswordResetRequestDto request) {
+        try {
+            authenticationService.initiatePasswordReset(request);
+            return ResponseEntity.ok().build();
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 
     @PostMapping("/reset-password-verify")
-    public ResponseEntity<Void> resetPasswordVerify(
-            @RequestBody PasswordResetVerifyDto request
-    ) {
-        authenticationService.completePasswordReset(request);
-        return ResponseEntity.ok().build();
+    public ResponseEntity<?> resetPasswordVerify(@RequestBody PasswordResetVerifyDto request) {
+        try {
+            authenticationService.completePasswordReset(request);
+            return ResponseEntity.ok().build();
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 } 
