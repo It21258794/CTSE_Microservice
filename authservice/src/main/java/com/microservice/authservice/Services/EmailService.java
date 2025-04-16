@@ -14,12 +14,15 @@ public class EmailService {
 
     private final RestTemplate restTemplate;
     private final String apiToken;
+    private final String fromEmail;
     private final String apiUrl = "https://api.postmarkapp.com/email";
-    private final String fromEmail = "it21277054@my.sliit.lk";
 
-    public EmailService(@Value("${spring.mail.username}") String apiToken) {
+    public EmailService(
+            @Value("${postmark.api.token}") String apiToken,
+            @Value("${postmark.sender.email}") String fromEmail) {
         this.restTemplate = new RestTemplate();
         this.apiToken = apiToken;
+        this.fromEmail = fromEmail;
     }
 
     public void sendEmail(String toEmail, String subject, String body) {
