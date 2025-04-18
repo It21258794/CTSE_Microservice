@@ -31,10 +31,11 @@ public class AWSConfig {
         String cleanedSecretKey = secretKey.trim();
         
         AwsBasicCredentials awsCredentials = AwsBasicCredentials.create(accessKey.trim(), cleanedSecretKey);
+        StaticCredentialsProvider credentialsProvider = StaticCredentialsProvider.create(awsCredentials);
         
         return SesClient.builder()
                 .region(Region.of(region.trim()))
-                .credentialsProvider(StaticCredentialsProvider.create(awsCredentials))
+                .credentialsProvider(credentialsProvider)
                 .build();
     }
 } 

@@ -1,6 +1,6 @@
 package com.microservice.authservice.config;
 
-import com.microservice.authservice.Repository.UserRepository;
+import com.microservice.authservice.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -21,8 +21,14 @@ public class ApplicationConfig {
 
     @Bean
     public UserDetailsService userDetailsService() {
-        return username -> userRepository.findByEmail(username)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+        return username -> {
+            var user = userRepository.findByEmail(username)
+                    .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+            if (!user.isEnabled()) {
+                throw new UsernameNotFoundException("User account is disabled");
+            }
+            return user;
+        };
     }
 
     @Bean

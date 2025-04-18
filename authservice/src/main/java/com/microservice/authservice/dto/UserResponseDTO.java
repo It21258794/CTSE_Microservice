@@ -15,7 +15,7 @@ public class UserResponseDTO {
     private String lastName;
     private String email;
     private String role;
-    private boolean isActive;
+    private boolean active;
     private String profilePictureUrl;  // Add this field
 
 }

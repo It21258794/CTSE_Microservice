@@ -1,10 +1,11 @@
-package com.microservice.authservice.service;
+package com.microservice.authservice.service.impl;
 
 import com.microservice.authservice.dto.UserDTO;
 import com.microservice.authservice.dto.UserResponseDTO;
 import com.microservice.authservice.model.User;
 import com.microservice.authservice.repository.UserRepository;
 import com.microservice.authservice.service.UserService;
+import com.microservice.authservice.service.S3Service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -45,7 +46,7 @@ public class UserServiceImpl implements UserService {
         existingUser.setLastName(userDTO.getLastName());
         existingUser.setEmail(userDTO.getEmail());
         existingUser.setRole(userDTO.getRole());
-        existingUser.setActive(userDTO.isActive());  // Changed from setIsActive to setActive
+        existingUser.setActive(userDTO.isActive());
 
         if (userDTO.getPassword() != null && !userDTO.getPassword().isEmpty()) {
             existingUser.setPassword(passwordEncoder.encode(userDTO.getPassword()));
@@ -70,8 +71,8 @@ public class UserServiceImpl implements UserService {
                 .lastName(user.getLastName())
                 .email(user.getEmail())
                 .role(user.getRole())
-                .isActive(user.isActive())
-                .profilePictureUrl(user.getProfilePictureUrl())  // Add this line
+                .active(user.isActive())
+                .profilePictureUrl(user.getProfilePictureUrl())
                 .build();
     }
 
@@ -88,17 +89,18 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<UserResponseDTO> getActiveUsers() {
-        return userRepository.findByIsActive(true).stream()  // Changed to findByIsActive
+        return userRepository.findByActive(true).stream()
                 .map(this::mapToUserResponseDTO)
                 .collect(Collectors.toList());
     }
 
     @Override
     public List<UserResponseDTO> getInactiveUsers() {
-        return userRepository.findByIsActive(false).stream()  // Changed to findByIsActive
+        return userRepository.findByActive(false).stream()
                 .map(this::mapToUserResponseDTO)
                 .collect(Collectors.toList());
     }
+
     @Override
     public String uploadProfilePicture(String userId, MultipartFile file) throws IOException {
         User user = userRepository.findById(userId)
@@ -126,12 +128,10 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        // Delete old picture if exists
         if (user.getProfilePictureUrl() != null && !user.getProfilePictureUrl().isEmpty()) {
             deleteProfilePictureFromS3(user.getProfilePictureUrl());
         }
 
-        // Upload new picture
         String imageUrl = s3Service.uploadFile(file);
         user.setProfilePictureUrl(imageUrl);
         userRepository.save(user);
@@ -158,4 +158,4 @@ public class UserServiceImpl implements UserService {
             throw new RuntimeException("Failed to delete profile picture from S3", e);
         }
     }
-}
+} 
