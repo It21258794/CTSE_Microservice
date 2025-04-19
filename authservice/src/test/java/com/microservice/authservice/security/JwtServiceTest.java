@@ -7,25 +7,40 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.util.ReflectionTestUtils;
 
+import javax.crypto.KeyGenerator;
+import javax.crypto.SecretKey;
 import java.security.Key;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
+import java.util.Base64;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@TestPropertySource(properties = {
+    "jwt.expiration=86400000"
+})
 class JwtServiceTest {
     private JwtService jwtService;
     private User user;
-    private static final String TEST_SECRET_KEY = "test_secret_key_for_jwt_testing_only_do_not_use_in_production";
+    private String testSecretKey;
     private static final long TEST_EXPIRATION = 86400000;
 
     @BeforeEach
-    void setUp() {
+    void setUp() throws NoSuchAlgorithmException {
+        // Generate a random 256-bit (32-byte) key
+        KeyGenerator keyGen = KeyGenerator.getInstance("HmacSHA256");
+        keyGen.init(256, new SecureRandom());
+        SecretKey secretKey = keyGen.generateKey();
+        testSecretKey = Base64.getEncoder().encodeToString(secretKey.getEncoded());
+
         jwtService = new JwtService();
-        ReflectionTestUtils.setField(jwtService, "secretKey", TEST_SECRET_KEY);
+        ReflectionTestUtils.setField(jwtService, "secretKey", testSecretKey);
         ReflectionTestUtils.setField(jwtService, "jwtExpiration", TEST_EXPIRATION);
 
         user = User.builder()
@@ -71,7 +86,7 @@ class JwtServiceTest {
     }
 
     private Claims extractClaims(String token) {
-        Key key = Keys.hmacShaKeyFor(TEST_SECRET_KEY.getBytes());
+        Key key = Keys.hmacShaKeyFor(testSecretKey.getBytes());
         return Jwts.parserBuilder()
                 .setSigningKey(key)
                 .build()
