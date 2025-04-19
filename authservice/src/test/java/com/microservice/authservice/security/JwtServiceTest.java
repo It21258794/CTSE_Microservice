@@ -33,7 +33,6 @@ class JwtServiceTest {
 
     @BeforeEach
     void setUp() throws NoSuchAlgorithmException {
-        // Generate a random 256-bit (32-byte) key
         KeyGenerator keyGen = KeyGenerator.getInstance("HmacSHA256");
         keyGen.init(256, new SecureRandom());
         SecretKey secretKey = keyGen.generateKey();
