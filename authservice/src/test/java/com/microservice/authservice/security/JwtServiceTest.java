@@ -7,7 +7,6 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.security.Key;
@@ -20,14 +19,14 @@ import static org.junit.jupiter.api.Assertions.*;
 class JwtServiceTest {
     private JwtService jwtService;
     private User user;
-    private String secretKey = "404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970";
-    private long jwtExpiration = 86400000;
+    private static final String TEST_SECRET_KEY = "test_secret_key_for_jwt_testing_only_do_not_use_in_production";
+    private static final long TEST_EXPIRATION = 86400000;
 
     @BeforeEach
     void setUp() {
         jwtService = new JwtService();
-        ReflectionTestUtils.setField(jwtService, "secretKey", secretKey);
-        ReflectionTestUtils.setField(jwtService, "jwtExpiration", jwtExpiration);
+        ReflectionTestUtils.setField(jwtService, "secretKey", TEST_SECRET_KEY);
+        ReflectionTestUtils.setField(jwtService, "jwtExpiration", TEST_EXPIRATION);
 
         user = User.builder()
                 .id("1")
@@ -72,7 +71,7 @@ class JwtServiceTest {
     }
 
     private Claims extractClaims(String token) {
-        Key key = Keys.hmacShaKeyFor(secretKey.getBytes());
+        Key key = Keys.hmacShaKeyFor(TEST_SECRET_KEY.getBytes());
         return Jwts.parserBuilder()
                 .setSigningKey(key)
                 .build()
