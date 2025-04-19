@@ -1,6 +1,34 @@
-HELP.md
-.gradle
+# Environment variables
+.env
+.env.*
+!.env.example
+
+# Build files
 build/
+.gradle/
+out/
+target/
+
+# IDE files
+.idea/
+*.iml
+.vscode/
+*.swp
+*.swo
+
+# Logs
+*.log
+logs/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Application specific
+application-*.properties
+!application.properties
+
+HELP.md
 !gradle/wrapper/gradle-wrapper.jar
 !**/src/main/**/build/
 !**/src/test/**/build/
@@ -18,13 +46,8 @@ bin/
 !**/src/test/**/bin/
 
 ### IntelliJ IDEA ###
-.idea
 *.iws
-*.iml
 *.ipr
-out/
-!**/src/main/**/out/
-!**/src/test/**/out/
 
 ### NetBeans ###
 /nbproject/private/
