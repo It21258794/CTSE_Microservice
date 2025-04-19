@@ -1,57 +1,43 @@
 package com.microservice.authservice.service;
 
-import com.nimbusds.jose.*;
-import com.nimbusds.jose.crypto.MACSigner;
-import com.nimbusds.jose.crypto.MACVerifier;
-import com.nimbusds.jwt.*;
+import com.microservice.authservice.security.JwtService;
+import io.jsonwebtoken.Claims;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 
-import java.text.ParseException;
-import java.util.Date;
 import java.util.Map;
 
 @Service
 public class TokenService {
 
-    private final String secret = "super-secret-key-should-be-256-bits-minimum!!";
+    private final JwtService jwtService;
+
+    @Autowired
+    public TokenService(JwtService jwtService) {
+        this.jwtService = jwtService;
+        System.out.println("TokenService initialized with JwtService");
+    }
 
     public String generateToken(OAuth2User oAuth2User) {
-        try {
-            JWSSigner signer = new MACSigner(secret.getBytes());
-
-            JWTClaimsSet claimsSet = new JWTClaimsSet.Builder()
-                    .subject(oAuth2User.getName())
-                    .claim("email", oAuth2User.getAttribute("email"))
-                    .claim("name", oAuth2User.getAttribute("name"))
-                    .expirationTime(new Date(System.currentTimeMillis() + 3600000)) // 1 hour
-                    .build();
-
-            SignedJWT signedJWT = new SignedJWT(
-                    new JWSHeader(JWSAlgorithm.HS256),
-                    claimsSet
-            );
-
-            signedJWT.sign(signer);
-            return signedJWT.serialize();
-
-        } catch (Exception e) {
-            throw new RuntimeException("Token generation failed", e);
-        }
+        System.out.println("Generating OAuth2 token for user: " + oAuth2User.getName());
+        String token = jwtService.generateToken(oAuth2User);
+        System.out.println("OAuth2 token generated successfully");
+        return token;
     }
 
     public Map<String, Object> validateToken(String token) {
+        System.out.println("Validating token: " + token);
         try {
-            SignedJWT signedJWT = SignedJWT.parse(token);
-            JWSVerifier verifier = new MACVerifier(secret.getBytes());
-
-            if (signedJWT.verify(verifier)) {
-                Date exp = signedJWT.getJWTClaimsSet().getExpirationTime();
-                if (exp.after(new Date())) {
-                    return signedJWT.getJWTClaimsSet().getClaims();
-                }
+            Claims claims = jwtService.extractAllClaims(token);
+            if (!jwtService.isTokenExpired(token)) {
+                System.out.println("Token is valid and not expired. Source: " + claims.get("source"));
+                return claims;
+            } else {
+                System.out.println("Token has expired");
             }
-        } catch (ParseException | JOSEException e) {
+        } catch (Exception e) {
+            System.out.println("Token validation error: " + e.getMessage());
             e.printStackTrace();
         }
         return null;

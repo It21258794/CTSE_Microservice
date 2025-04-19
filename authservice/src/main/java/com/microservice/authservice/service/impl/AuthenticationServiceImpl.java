@@ -44,7 +44,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 .lastName(request.getLastName())
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
-                .role(Role.USER.name())
+                .role(request.getRole() != null ? request.getRole() : Role.USER.name())
                 .active(true)
                 .build();
 
