@@ -35,3 +35,44 @@ out/
 
 ### VS Code ###
 .vscode/
+
+
+# AWS & Secrets
+.aws/
+*.pem
+*.key
+.env
+.env.local
+.env.*.local
+config/secrets.yml
+terraform.tfvars
+
+# Build / Dependencies
+/build/
+.gradle/
+.mvn/
+target/
+*.jar
+*.war
+*.ear
+logs/
+*.log
+hs_err_pid*
+
+# Docker & Kubernetes
+docker-compose.override.yml
+.dockerignore
+k8s/*.yaml
+helm/**/values.yaml
+
+# IDE & OS Files
+.idea/
+.settings/
+.DS_Store
+Thumbs.db
+*.swp
+
+# Terraform
+*.tfstate
+*.tfstate.backup
+.terraform/

@@ -1,0 +1,9 @@
+spring:
+  data:
+    mongodb:
+      uri: mongodb+srv://admin:password@cluster0.mongodb.net/authdb
+  security:
+    jwt:
+      secret: mySecretKey
+server:
+  port: 8080
