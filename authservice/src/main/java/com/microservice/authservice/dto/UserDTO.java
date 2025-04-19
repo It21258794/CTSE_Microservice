@@ -9,8 +9,11 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class PasswordResetVerifyDto {
+public class UserDTO {
+    private String firstName;
+    private String lastName;
     private String email;
-    private String otp;
-    private String newPassword;
-} 
+    private String password;
+    private String role;
+    private boolean active;
+}
