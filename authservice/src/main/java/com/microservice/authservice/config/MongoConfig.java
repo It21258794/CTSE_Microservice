@@ -22,7 +22,7 @@ public class MongoConfig {
 
         List<User> users = mongoTemplate.findAll(User.class);
         users.forEach(user -> {
-            Query query = new Query(Criteria.where("email").is(user.getEmail()));
+            Query query = new Query(Criteria.where("email").is(user.getUsername()));
             List<User> duplicates = mongoTemplate.find(query, User.class);
             if (duplicates.size() > 1) {
                 for (int i = 1; i < duplicates.size(); i++) {
