@@ -22,7 +22,9 @@ resource "aws_subnet" "auth_service_public_subnet" {
   map_public_ip_on_launch = true
 
   tags = {
-    Name = "auth-service-public-subnet"
+    Name                                        = "auth-service-public-subnet"
+    "kubernetes.io/role/elb"                   = "1"
+    "kubernetes.io/cluster/auth-service-cluster" = "owned"
   }
 }
 
@@ -32,7 +34,9 @@ resource "aws_subnet" "auth_service_private_subnet" {
   availability_zone = var.az_private
 
   tags = {
-    Name = "auth-service-private-subnet"
+    Name                                        = "auth-service-private-subnet"
+    "kubernetes.io/role/internal-elb"          = "1"
+    "kubernetes.io/cluster/auth-service-cluster" = "owned"
   }
 }
 
@@ -70,11 +74,27 @@ resource "aws_security_group" "auth_service_sg" {
   vpc_id = aws_vpc.auth_service_vpc.id
 
   ingress {
-    description = "Allow EKS control plane to communicate with worker nodes"
+    description = "Allow control plane to worker nodes"
     from_port   = 443
     to_port     = 443
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    description = "Allow worker node to control plane"
+    from_port   = 1025
+    to_port     = 65535
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    description = "Worker-to-worker"
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    self        = true
   }
 
   egress {
@@ -158,7 +178,6 @@ resource "aws_iam_role_policy_attachment" "ec2_container_registry_read_only" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
 }
 
-# ✅ Add SSM if troubleshooting nodes
 resource "aws_iam_role_policy_attachment" "ssm" {
   role       = aws_iam_role.eks_node_role.name
   policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
@@ -176,7 +195,7 @@ resource "aws_eks_cluster" "auth_service_cluster" {
       aws_subnet.auth_service_public_subnet.id,
       aws_subnet.auth_service_private_subnet.id
     ]
-    security_group_ids = [aws_security_group.auth_service_sg.id]
+    security_group_ids     = [aws_security_group.auth_service_sg.id]
     endpoint_private_access = true
     endpoint_public_access  = true
   }
@@ -200,7 +219,7 @@ resource "aws_eks_node_group" "auth_node_group" {
   node_role_arn   = aws_iam_role.eks_node_role.arn
 
   subnet_ids = [
-    aws_subnet.auth_service_private_subnet.id
+    aws_subnet.auth_service_public_subnet.id
   ]
 
   instance_types = var.instance_types
@@ -221,4 +240,26 @@ resource "aws_eks_node_group" "auth_node_group" {
   tags = {
     Name = "auth-node-group"
   }
+}
+
+# ------------------------------
+# ECR Repository
+# ------------------------------
+resource "aws_ecr_repository" "auth_service_repo" {
+  name = "auth-service-repo"
+
+  image_scanning_configuration {
+    scan_on_push = true
+  }
+
+  image_tag_mutability = "MUTABLE"
+
+  tags = {
+    Name = "auth-service-ecr"
+  }
+}
+
+output "auth_service_ecr_repository_url" {
+  description = "ECR repository URL for the Auth Service"
+  value       = aws_ecr_repository.auth_service_repo.repository_url
 }
