@@ -10,9 +10,6 @@ env:
     S3_BUCKET: config.authservice
     S3_KEY: application.properties
 
-  secrets-manager:
-    SONAR_TOKEN: "arn:aws:secretsmanager:us-west-2:329599621234:secret:sonarcloud-to8iCx"
-
 phases:
   install:
     runtime-versions:
@@ -41,7 +38,7 @@ phases:
       - echo Building the Spring Boot application...
       - ./gradlew clean build
       - echo Running SonarCloud analysis...
-      - ./gradlew sonarqube --warning-mode all -Dsonar.token=$SONAR_TOKEN
+      - ./gradlew sonar --warning-mode all -Dsonar.token=$SONAR_TOKEN
       - echo Building the Docker image...
       - docker build -t $REPOSITORY_URI:latest . || exit 1
       - docker tag $REPOSITORY_URI:latest $REPOSITORY_URI:$CODEBUILD_RESOLVED_SOURCE_VERSION
