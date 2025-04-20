@@ -41,9 +41,9 @@ phases:
       - echo Building the Spring Boot application...
       - ./gradlew clean build
       - echo Running SonarCloud analysis...
-      - ./gradlew sonarqube -Dsonar.token=$SONAR_TOKEN
+      - ./gradlew sonarqube --warning-mode all -Dsonar.token=$SONAR_TOKEN
       - echo Building the Docker image...
-      - docker build -t $REPOSITORY_URI:latest .
+      - docker build -t $REPOSITORY_URI:latest . || exit 1
       - docker tag $REPOSITORY_URI:latest $REPOSITORY_URI:$CODEBUILD_RESOLVED_SOURCE_VERSION
       - docker images
 
