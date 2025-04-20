@@ -1,5 +1,5 @@
 resource "aws_ses_email_identity" "auth_service_email" {
-  email = "noreply@yourdomain.com"
+  email = "it21277054@my.sliit.lk"
 }
 
 resource "aws_iam_policy" "ses_send_policy" {

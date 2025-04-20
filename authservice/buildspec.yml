@@ -7,6 +7,8 @@ env:
     DEPLOYMENT_NAME: auth-service
     CONTAINER_NAME: auth-service
     REPOSITORY_URI: 329599621234.dkr.ecr.us-west-2.amazonaws.com/auth-service-repo
+    S3_BUCKET: config.authservice
+    S3_KEY: /application.properties
 
 phases:
   install:
@@ -25,13 +27,15 @@ phases:
   pre_build:
     commands:
       - echo Logging in to Amazon ECR...
-      - aws --version
       - aws ecr get-login-password --region $REGION | docker login --username AWS --password-stdin $REPOSITORY_URI
+
+      - echo Downloading application.properties from S3...
+      - aws s3 cp s3://$S3_BUCKET/$S3_KEY src/main/resources/application.properties
+      - echo application.properties downloaded successfully.
 
   build:
     commands:
       - echo Building the Spring Boot application...
-      - ls -la
       - ./gradlew build
       - echo Building the Docker image...
       - docker build -t $REPOSITORY_URI:latest .
