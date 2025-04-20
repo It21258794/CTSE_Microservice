@@ -15,6 +15,8 @@ phases:
     commands:
       - echo Installing dependencies...
       - pip install --upgrade awscli
+      - echo Granting execute permission to Gradle wrapper...
+      - chmod +x ./gradlew
 
   pre_build:
     commands:
@@ -24,16 +26,14 @@ phases:
 
   build:
     commands:
+      - echo Building the Spring Boot application...
+      - ./gradlew build
       - echo Building the Docker image...
-      - cd authservice
       - docker build -t $REPOSITORY_URI:latest .
       - docker tag $REPOSITORY_URI:latest $REPOSITORY_URI:$CODEBUILD_RESOLVED_SOURCE_VERSION
 
   post_build:
     commands:
-      - echo Moving into the authservice directory...
-      - cd authservice
-
       - echo Pushing the Docker images to ECR...
       - docker push $REPOSITORY_URI:latest
       - docker push $REPOSITORY_URI:$CODEBUILD_RESOLVED_SOURCE_VERSION
