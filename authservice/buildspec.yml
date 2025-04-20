@@ -25,11 +25,15 @@ phases:
   build:
     commands:
       - echo Building the Docker image...
+      - cd authservice
       - docker build -t $REPOSITORY_URI:latest .
       - docker tag $REPOSITORY_URI:latest $REPOSITORY_URI:$CODEBUILD_RESOLVED_SOURCE_VERSION
 
   post_build:
     commands:
+      - echo Moving into the authservice directory...
+      - cd authservice
+
       - echo Pushing the Docker images to ECR...
       - docker push $REPOSITORY_URI:latest
       - docker push $REPOSITORY_URI:$CODEBUILD_RESOLVED_SOURCE_VERSION
