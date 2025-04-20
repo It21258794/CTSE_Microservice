@@ -15,8 +15,10 @@ phases:
     commands:
       - echo Installing dependencies...
       - pip install --upgrade awscli
-      - echo Granting execute permission to Gradle wrapper...
+      - echo Granting execute permission to Gradle wrapper in authservice...
+      - cd authservice  # Ensure we're in the authservice directory
       - chmod +x ./gradlew
+      - echo Gradle wrapper permissions granted.
 
   pre_build:
     commands:
@@ -27,6 +29,7 @@ phases:
   build:
     commands:
       - echo Building the Spring Boot application...
+      - cd authservice  # Ensure we're in the correct directory
       - ./gradlew build
       - echo Building the Docker image...
       - docker build -t $REPOSITORY_URI:latest .
