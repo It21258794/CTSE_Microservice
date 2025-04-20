@@ -16,7 +16,8 @@ phases:
     commands:
       - echo Installing dependencies...
       - pip install --upgrade awscli
-      - echo Granting execute permission to Gradle wrapper...
+      - echo Granting execute permission to Gradle wrapper in authservice...
+      - cd authservice
       - chmod +x ./gradlew
       - echo Gradle wrapper permissions granted.
       - java -version
