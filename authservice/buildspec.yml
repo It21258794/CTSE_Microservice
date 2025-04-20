@@ -36,21 +36,12 @@ phases:
       - aws s3 cp s3://$S3_BUCKET/$S3_KEY src/main/resources/application.properties
       - echo application.properties downloaded successfully.
 
+      # DNS resolution test
+      - echo "Testing basic DNS resolution with curl..."
+      - curl -I https://google.com || echo "DNS resolution failed!"
+
       - echo Setting up SonarCloud...
-      - echo "Testing DNS resolution for get.sonarsource.com..."
-      - nslookup get.sonarsource.com || echo "DNS lookup failed, might cause issues with curl."
-
-      - |
-        if curl -sSf https://get.sonarsource.com/sonar-scanner-cli-linux.zip -o sonar-scanner.zip; then
-          echo "SonarScanner downloaded successfully via curl."
-        else
-          echo "curl failed, trying wget..."
-          if ! wget -O sonar-scanner.zip https://get.sonarsource.com/sonar-scanner-cli-linux.zip; then
-            echo "Failed to download SonarScanner. Exiting..."
-            exit 1
-          fi
-        fi
-
+      - curl -sS https://get.sonarsource.com/sonar-scanner-cli-linux.zip -o sonar-scanner.zip
       - unzip sonar-scanner.zip -d /opt
       - export PATH=$PATH:/opt/sonar-scanner-*/bin
       - echo SonarCloud setup completed.
