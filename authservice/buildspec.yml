@@ -12,6 +12,7 @@ phases:
   install:
     runtime-versions:
       python: 3.11
+      java: corretto17
     commands:
       - echo Installing dependencies...
       - pip install --upgrade awscli
@@ -19,6 +20,7 @@ phases:
       - cd authservice
       - chmod +x ./gradlew
       - echo Gradle wrapper permissions granted.
+      - java -version
 
   pre_build:
     commands:
