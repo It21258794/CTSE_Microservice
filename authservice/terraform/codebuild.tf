@@ -72,7 +72,7 @@ resource "aws_codebuild_project" "auth_build" {
   source {
     type            = "GITHUB"
     location        = "https://github.com/It21258794/CTSE_Microservice.git"
-    buildspec       = "buildspec.yml"
+    buildspec       = "authservice/buildspec.yml"
     git_clone_depth = 1
   }
 
