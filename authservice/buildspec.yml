@@ -30,7 +30,6 @@ phases:
     commands:
       - echo Building the Spring Boot application...
       - ls -la
-      - cd authservice
       - ./gradlew build
       - echo Building the Docker image...
       - docker build -t $REPOSITORY_URI:latest .
