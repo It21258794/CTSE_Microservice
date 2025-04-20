@@ -1,8 +1,7 @@
-package com.microservice.authservice.Controller;
+package com.microservice.authservice.controller;
 
 import com.microservice.authservice.service.AuthenticationService;
 import com.microservice.authservice.dto.AuthenticationRequest;
-import com.microservice.authservice.dto.AuthenticationResponse;
 import com.microservice.authservice.dto.PasswordResetRequestDto;
 import com.microservice.authservice.dto.PasswordResetVerifyDto;
 import com.microservice.authservice.dto.RegisterRequest;
