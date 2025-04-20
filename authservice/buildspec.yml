@@ -11,7 +11,6 @@ env:
 phases:
   install:
     runtime-versions:
-      docker: 20
       python: 3.11
     commands:
       - echo Installing dependencies...
