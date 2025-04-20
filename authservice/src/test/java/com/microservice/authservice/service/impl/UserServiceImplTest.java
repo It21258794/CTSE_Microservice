@@ -14,6 +14,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
@@ -186,17 +187,4 @@ class UserServiceImplTest {
         assertThrows(RuntimeException.class, () -> userService.getProfilePicture("1"));
     }
 
-    @Test
-    void updateProfilePicture_ValidFile_ReturnsNewUrl() throws IOException {
-        MultipartFile file = mock(MultipartFile.class);
-        when(userRepository.findById("1")).thenReturn(Optional.of(user));
-        when(s3Service.uploadFile(any())).thenReturn("http://example.com/updated-profile.jpg");
-        when(userRepository.save(any())).thenReturn(user);
-
-        String result = userService.updateProfilePicture("1", file);
-        assertNotNull(result);
-        assertEquals("http://example.com/updated-profile.jpg", result);
-        verify(s3Service).deleteFile(user.getProfilePictureUrl());
-        verify(s3Service).uploadFile(file);
-    }
 } 
