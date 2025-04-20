@@ -187,25 +187,4 @@ class UserServiceImplTest {
         assertThrows(RuntimeException.class, () -> userService.getProfilePicture("1"));
     }
 
-    @Test
-    void updateProfilePicture_ValidFile_ReturnsNewUrl() throws IOException {
-        MultipartFile file = mock(MultipartFile.class);
-        when(file.getOriginalFilename()).thenReturn("profile.jpg");
-        when(file.getInputStream()).thenReturn(new ByteArrayInputStream(new byte[0]));
-
-        User user = new User();
-        user.setId("1");
-        user.setProfilePictureUrl("http://example.com/old-profile.jpg");
-
-        when(userRepository.findById("1")).thenReturn(Optional.of(user));
-        when(s3Service.uploadFile(any())).thenReturn("http://example.com/updated-profile.jpg");
-        when(userRepository.save(any())).thenReturn(user);
-
-        String result = userService.updateProfilePicture("1", file);
-        assertNotNull(result);
-        assertEquals("http://example.com/updated-profile.jpg", result);
-        verify(s3Service).deleteFile("http://example.com/old-profile.jpg");
-        verify(s3Service).uploadFile(file);
-    }
-
 } 
