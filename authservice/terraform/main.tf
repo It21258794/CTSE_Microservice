@@ -65,9 +65,7 @@ resource "aws_route_table_association" "auth_service_public_rta" {
   route_table_id = aws_route_table.auth_service_public_rt.id
 }
 
-# ------------------------------
 # Security Group
-# ------------------------------
 resource "aws_security_group" "auth_service_sg" {
   vpc_id = aws_vpc.auth_service_vpc.id
 
@@ -107,9 +105,7 @@ resource "aws_security_group" "auth_service_sg" {
   }
 }
 
-# ------------------------------
 # IAM Role for EKS Cluster
-# ------------------------------
 resource "aws_iam_role" "eks_role" {
   name = "eks-role"
 
@@ -139,9 +135,7 @@ resource "aws_iam_role_policy_attachment" "eks_service_policy" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonEKSServicePolicy"
 }
 
-# ------------------------------
 # IAM Role for Node Group
-# ------------------------------
 resource "aws_iam_role" "eks_node_role" {
   name = "eks-node-role"
 
