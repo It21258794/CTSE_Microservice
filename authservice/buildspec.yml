@@ -32,34 +32,29 @@ phases:
       - echo Logging in to Amazon ECR...
       - aws ecr get-login-password --region $REGION | docker login --username AWS --password-stdin $REPOSITORY_URI
       - aws sts get-caller-identity
-
       - echo Downloading application.properties from S3...
       - aws s3 cp s3://$S3_BUCKET/$S3_KEY src/main/resources/application.properties
       - echo application.properties downloaded successfully.
 
-      # DNS resolution test
-      - echo "Testing basic DNS resolution with curl..."
-      - curl -I https://google.com || echo "DNS resolution failed!"
-
   build:
     commands:
-      - echo Building the Spring Boot application and running SonarCloud analysis...
-      - ./gradlew clean build sonarqube -Dsonar.token=$SONAR_TOKEN
-
+      - echo Building the Spring Boot application...
+      - ./gradlew clean build
+      - echo Running SonarCloud analysis...
+      - ./gradlew sonarqube -Dsonar.token=$SONAR_TOKEN
       - echo Building the Docker image...
       - docker build -t $REPOSITORY_URI:latest .
       - docker tag $REPOSITORY_URI:latest $REPOSITORY_URI:$CODEBUILD_RESOLVED_SOURCE_VERSION
+      - docker images
 
   post_build:
     commands:
       - echo Pushing the Docker images to ECR...
       - docker push $REPOSITORY_URI:latest
       - docker push $REPOSITORY_URI:$CODEBUILD_RESOLVED_SOURCE_VERSION
-
       - echo Updating kubeconfig for cluster $CLUSTER_NAME...
       - export AWS_SDK_LOAD_CONFIG=1
       - aws eks update-kubeconfig --region $REGION --name $CLUSTER_NAME
-
       - echo Deploying new image to EKS...
       - kubectl set image deployment/$DEPLOYMENT_NAME $CONTAINER_NAME=$REPOSITORY_URI:$CODEBUILD_RESOLVED_SOURCE_VERSION
       - kubectl rollout status deployment/$DEPLOYMENT_NAME
