@@ -2,17 +2,17 @@ version: 0.2
 
 env:
   variables:
-    CLUSTER_NAME: auth-service-cluster  # Your actual EKS cluster name
-    REGION: us-west-2  # Your AWS region (change it if needed)
-    DEPLOYMENT_NAME: auth-service  # Your Kubernetes deployment name
-    CONTAINER_NAME: auth-service  # Your container name in the deployment
-    REPOSITORY_URI: 329599621234.dkr.ecr.us-west-2.amazonaws.com/auth-service  # Your ECR repository URI
+    CLUSTER_NAME: auth-service-cluster
+    REGION: us-west-2
+    DEPLOYMENT_NAME: auth-service
+    CONTAINER_NAME: auth-service
+    REPOSITORY_URI: 329599621234.dkr.ecr.us-west-2.amazonaws.com/auth-service
 
 phases:
   install:
     runtime-versions:
       docker: 20
-      python: 3.11  # for AWS CLI v2
+      python: 3.11
     commands:
       - echo Installing dependencies...
       - pip install --upgrade awscli

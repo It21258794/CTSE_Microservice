@@ -1,6 +1,4 @@
-# ------------------------------
 # IAM Role for CodeBuild
-# ------------------------------
 resource "aws_iam_role" "codebuild_auth_role" {
   name = "codebuild-auth-role"
 
@@ -32,17 +30,13 @@ resource "aws_iam_role_policy_attachment" "codebuild_ecr_policy" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryPowerUser"
 }
 
-# ------------------------------
 # CodeStar GitHub Connection (create this once)
-# ------------------------------
 resource "aws_codestarconnections_connection" "github_connection" {
   name          = "github-connection"
   provider_type = "GitHub"
 }
 
-# ------------------------------
 # CodeBuild Project
-# ------------------------------
 resource "aws_codebuild_project" "auth_build" {
   name          = "auth-service-build"
   description   = "Build project for auth service"

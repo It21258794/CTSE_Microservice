@@ -2,9 +2,7 @@ provider "aws" {
   region = var.region
 }
 
-# ------------------------------
 # VPC and Subnets
-# ------------------------------
 resource "aws_vpc" "auth_service_vpc" {
   cidr_block           = var.vpc_cidr
   enable_dns_support   = true
@@ -183,9 +181,7 @@ resource "aws_iam_role_policy_attachment" "ssm" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
 }
 
-# ------------------------------
 # EKS Cluster
-# ------------------------------
 resource "aws_eks_cluster" "auth_service_cluster" {
   name     = "auth-service-cluster"
   role_arn = aws_iam_role.eks_role.arn
@@ -210,9 +206,7 @@ resource "aws_eks_cluster" "auth_service_cluster" {
   }
 }
 
-# ------------------------------
 # EKS Node Group
-# ------------------------------
 resource "aws_eks_node_group" "auth_node_group" {
   cluster_name    = aws_eks_cluster.auth_service_cluster.name
   node_group_name = "auth-node-group"
@@ -242,9 +236,7 @@ resource "aws_eks_node_group" "auth_node_group" {
   }
 }
 
-# ------------------------------
 # ECR Repository
-# ------------------------------
 resource "aws_ecr_repository" "auth_service_repo" {
   name = "auth-service-repo"
 

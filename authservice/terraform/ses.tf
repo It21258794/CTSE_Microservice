@@ -1,9 +1,7 @@
-# Identity (domain or email)
 resource "aws_ses_email_identity" "auth_service_email" {
-  email = "noreply@yourdomain.com" # change this to your verified domain/email
+  email = "noreply@yourdomain.com"
 }
 
-# (Optional) IAM policy for SES sending permissions
 resource "aws_iam_policy" "ses_send_policy" {
   name        = "SESSendPolicy"
   description = "Allows sending emails via SES"
@@ -20,7 +18,6 @@ resource "aws_iam_policy" "ses_send_policy" {
   })
 }
 
-# (Optional) Attach to IAM Role (e.g., Lambda/EC2 using SES)
 resource "aws_iam_role_policy_attachment" "attach_ses_policy" {
   role       = aws_iam_role.eks_node_role.name
   policy_arn = aws_iam_policy.ses_send_policy.arn
