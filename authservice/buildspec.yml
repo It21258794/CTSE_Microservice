@@ -6,7 +6,7 @@ env:
     REGION: us-west-2
     DEPLOYMENT_NAME: auth-service
     CONTAINER_NAME: auth-service
-    REPOSITORY_URI: 329599621234.dkr.ecr.us-west-2.amazonaws.com/auth-service
+    REPOSITORY_URI: 329599621234.dkr.ecr.us-west-2.amazonaws.com/auth-service-repo
 
 phases:
   install:
@@ -36,6 +36,7 @@ phases:
       - docker push $REPOSITORY_URI:$CODEBUILD_RESOLVED_SOURCE_VERSION
 
       - echo Updating kubeconfig for cluster $CLUSTER_NAME...
+      - export AWS_SDK_LOAD_CONFIG=1
       - aws eks update-kubeconfig --region $REGION --name $CLUSTER_NAME
 
       - echo Deploying new image to EKS...
