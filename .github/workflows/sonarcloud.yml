@@ -28,7 +28,7 @@ jobs:
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@v2
         with:
-          projectKey: your-project-key
-          organization: your-org
+          projectKey: It21258794_CTSE_Microservice
+          organization: it21258794
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
