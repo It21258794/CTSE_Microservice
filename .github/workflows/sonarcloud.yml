@@ -22,13 +22,13 @@ jobs:
           distribution: 'temurin'
           java-version: 17
 
-      - name: Build project (adjust this if you're not using Gradle or Maven)
-        run: |
-          ./gradlew build
+      - name: Build project
+        working-directory: authservice
+        run: ./gradlew build
 
       - name: Run SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@v2
         with:
-          projectBaseDir: .
+          projectBaseDir: authservice
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
