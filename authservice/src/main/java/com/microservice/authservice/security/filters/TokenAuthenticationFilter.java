@@ -26,7 +26,6 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
         String path = request.getRequestURI();
-        // Skip token validation for all auth endpoints and other public paths
         boolean shouldSkip = path.startsWith("/api/v1/auth/") || 
                            path.startsWith("/swagger-ui/") || 
                            path.startsWith("/v3/api-docs/") ||
@@ -34,7 +33,6 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
         
         if (shouldSkip) {
             System.out.println("TokenAuthenticationFilter: Skipping filter for path: " + path);
-            // Set anonymous authentication for skipped paths
             SecurityContextHolder.getContext().setAuthentication(null);
         }
         
@@ -63,26 +61,33 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
 
             if (claims != null) {
                 System.out.println("TokenAuthenticationFilter: Token validation successful");
+
                 OAuth2User user = new DefaultOAuth2User(
                         null,
                         claims,
                         "sub"
                 );
+
                 UsernamePasswordAuthenticationToken authentication =
                         new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
                 authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authentication);
                 System.out.println("TokenAuthenticationFilter: Authentication set in SecurityContext");
+
                 filterChain.doFilter(request, response);
                 return;
             } else {
                 System.out.println("TokenAuthenticationFilter: Token validation failed");
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                response.getWriter().write("Invalid or expired token");
+                return;
             }
         } else {
-            System.out.println("TokenAuthenticationFilter: No valid Authorization header found");
+            System.out.println("TokenAuthenticationFilter: Missing or malformed Authorization header");
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.getWriter().write("Missing or invalid Authorization header");
+            return;
         }
 
-        System.out.println("TokenAuthenticationFilter: Proceeding to OAuth2 filter");
-        filterChain.doFilter(request, response);
     }
 } 
