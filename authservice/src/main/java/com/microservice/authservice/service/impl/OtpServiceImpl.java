@@ -3,6 +3,7 @@ package com.microservice.authservice.service.impl;
 import com.microservice.authservice.service.OtpService;
 import org.springframework.stereotype.Service;
 
+import java.security.SecureRandom;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
@@ -47,7 +48,7 @@ public class OtpServiceImpl implements OtpService {
     }
 
     private String generateRandomOtp() {
-        Random random = new Random();
+        SecureRandom random = new SecureRandom();
         StringBuilder otp = new StringBuilder();
         for (int i = 0; i < OTP_LENGTH; i++) {
             otp.append(random.nextInt(10));
