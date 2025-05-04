@@ -52,8 +52,12 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             String jwt = authHeader.substring(7);
             System.out.println("TokenAuthenticationFilter: Validating JWT token");
-
-            Map<String, Object> claims = tokenService.validateToken(jwt);
+            Map<String, Object> claims = null;
+            try {
+                claims = tokenService.validateToken(jwt);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
 
             if (claims != null) {
                 System.out.println("TokenAuthenticationFilter: Token validation successful");

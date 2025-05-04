@@ -26,7 +26,7 @@ public class TokenService {
         return token;
     }
 
-    public Map<String, Object> validateToken(String token) {
+    public Map<String, Object> validateToken(String token) throws Exception {
         System.out.println("Validating token: " + token);
         try {
             Claims claims = jwtService.extractAllClaims(token);
@@ -37,8 +37,7 @@ public class TokenService {
                 System.out.println("Token has expired");
             }
         } catch (Exception e) {
-            System.out.println("Token validation error: " + e.getMessage());
-            e.printStackTrace();
+            throw new Exception("Token validation failed", e);
         }
         return null;
     }

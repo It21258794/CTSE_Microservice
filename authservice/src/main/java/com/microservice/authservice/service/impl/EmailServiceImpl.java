@@ -39,7 +39,6 @@ public class EmailServiceImpl implements EmailService {
             throw new RuntimeException("Failed to send email: " + e.awsErrorDetails().errorMessage(), e);
         } catch (Exception e) {
             System.err.println("Unexpected error while sending email: " + e.getMessage());
-            e.printStackTrace();
             throw new RuntimeException("Unexpected error while sending email", e);
         }
     }
