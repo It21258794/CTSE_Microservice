@@ -9,6 +9,7 @@ jobs:
   sonarcloud:
     name: SonarCloud Analysis
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v3
 
@@ -25,10 +26,15 @@ jobs:
           key: ${{ runner.os }}-sonar
           restore-keys: ${{ runner.os }}-sonar
 
-      - name: SonarCloud Scan
-        uses: SonarSource/sonarcloud-github-action@v2
-        with:
-          projectKey: It21258794_CTSE_Microservice
-          organization: it21258794
+      - name: Install SonarScanner
+        run: |
+          curl -sSLo sonar-scanner.zip https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-5.0.1.3006-linux.zip
+          unzip sonar-scanner.zip
+          export PATH=$PATH:$PWD/sonar-scanner-5.0.1.3006-linux/bin
+
+      - name: Run SonarCloud Scanner
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: |
+          ./sonar-scanner-5.0.1.3006-linux/bin/sonar-scanner \
+            -Dsonar.login=${{ secrets.SONAR_TOKEN }}
