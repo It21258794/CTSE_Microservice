@@ -32,7 +32,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     @Override
     public AuthenticationResponse register(RegisterRequest request) {
         System.out.println("Attempting to register user with email: " + request.getEmail());
-        
+        //comment
         if (userRepository.findByEmail(request.getEmail()).isPresent()) {
             System.out.println("Registration failed: Email already exists - " + request.getEmail());
             throw new RuntimeException("Email already exists");
